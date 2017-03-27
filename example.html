@@ -64,7 +64,7 @@
         src="https://code.jquery.com/jquery-3.2.1.min.js"
         integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
         crossorigin="anonymous"></script>
-<script type="text/javascript" src="dist/js/jquery.dragsort.min.js"></script>
+<script type="text/javascript" src="dist/js/jquery.dragsort.js"></script>
 
 <h1>jQuery List DragSort Example</h1>
 
@@ -167,7 +167,8 @@
             dragSelector: "div",
             dragBetween: true,
             dragEnd: saveOrder,
-            placeHolderTemplate: "<li class='placeHolder'><div></div></li>"
+            placeHolderTemplate: "<li class='placeHolder'><div></div></li>",
+			cursor: "move"
         });
     });
 </script>

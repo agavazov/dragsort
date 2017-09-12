@@ -4,8 +4,8 @@
 
 (function ($) {
     $.fn.dragsort = function (options) {
-        if (options == "destroy") {
-            $(this.selector).trigger("dragsort-uninit");
+        if (options == 'destroy') {
+            $(this.selector).trigger('dragsort-uninit');
             return;
         }
 
@@ -16,8 +16,9 @@
         this.each(function (i, cont) {
 
             //if list container is table, the browser automatically wraps rows in tbody if not specified so change list container to tbody so that children returns rows as user expected
-            if ($(cont).is("table") && $(cont).children().length == 1 && $(cont).children().is("tbody"))
+            if ($(cont).is('table') && $(cont).children().length == 1 && $(cont).children().is('tbody')) {
                 cont = $(cont).children().get(0);
+            }
 
             var newList = {
                 draggedItem: null,
@@ -30,22 +31,25 @@
 
                 init: function () {
                     //set options to default values if not set
-                    opts.tagName = $(this.container).children().length == 0 ? "li" : $(this.container).children().get(0).tagName.toLowerCase();
-                    if (opts.itemSelector == "")
+                    opts.tagName = $(this.container).children().length == 0 ? 'li' : $(this.container).children().get(0).tagName.toLowerCase();
+                    if (!opts.itemSelector) {
                         opts.itemSelector = opts.tagName;
-                    if (opts.dragSelector == "")
+                    }
+                    if (!opts.dragSelector) {
                         opts.dragSelector = opts.tagName;
-                    if (opts.placeHolderTemplate == "")
-                        opts.placeHolderTemplate = "<" + opts.tagName + ">&nbsp;</" + opts.tagName + ">";
+                    }
+                    if (!opts.placeHolderTemplate) {
+                        opts.placeHolderTemplate = '<' + opts.tagName + '>&nbsp;</' + opts.tagName + '>';
+                    }
 
                     //listidx allows reference back to correct list variable instance
-                    $(this.container).attr("data-listidx", i).mousedown(this.grabItem).bind("dragsort-uninit", this.uninit);
+                    $(this.container).attr('data-listidx', i).bind('mousedown touchstart', this.grabItem).bind('dragsort-uninit', this.uninit);
                     this.styleDragHandlers(true);
                 },
 
                 uninit: function () {
-                    var list = lists[$(this).attr("data-listidx")];
-                    $(list.container).unbind("mousedown", list.grabItem).unbind("dragsort-uninit");
+                    var list = lists[$(this).attr('data-listidx')];
+                    $(list.container).unbind('mousedown touchstart', list.grabItem).unbind('dragsort-uninit');
                     list.styleDragHandlers(false);
                 },
 
@@ -56,19 +60,20 @@
                 styleDragHandlers: function (cursor) {
                     this.getItems().map(function () {
                         return $(this).is(opts.dragSelector) ? this : $(this).find(opts.dragSelector).get();
-                    }).css("cursor", cursor ? opts.cursor : "");
+                    }).css('cursor', cursor ? opts.cursor : 'default');
                 },
 
                 grabItem: function (e) {
-                    var list = lists[$(this).attr("data-listidx")];
-                    var item = $(e.target).closest("[data-listidx] > " + opts.tagName).get(0);
+                    var list = lists[$(this).attr('data-listidx')];
+                    var item = $(e.target).closest('[data-listidx] > ' + opts.tagName).get(0);
                     var insideMoveableItem = list.getItems().filter(function () {
-                            return this == item;
-                        }).length > 0;
+                        return this == item;
+                    }).length > 0;
 
                     //if not left click or if clicked on excluded element (e.g. text box) or not a moveable list item return
-                    if (e.which != 1 || $(e.target).is(opts.dragSelectorExclude) || $(e.target).closest(opts.dragSelectorExclude).length > 0 || !insideMoveableItem)
+                    if ((e.which != 1 && e.which != 0) || $(e.target).is(opts.dragSelectorExclude) || $(e.target).closest(opts.dragSelectorExclude).length > 0 || !insideMoveableItem) {
                         return;
+                    }
 
                     //prevents selection, stops issue on Fx where dragging hyperlink doesn't work and on IE where it triggers mousemove even though mouse hasn't moved,
                     //does also stop being able to click text boxes hence dragging on text boxes by default is disabled in dragSelectorExclude
@@ -77,37 +82,46 @@
                     //change cursor to move while dragging
                     var dragHandle = e.target;
                     while (!$(dragHandle).is(opts.dragSelector)) {
-                        if (dragHandle == this) return;
+                        if (dragHandle == this) {
+                            return;
+                        }
                         dragHandle = dragHandle.parentNode;
                     }
-                    $(dragHandle).attr("data-cursor", $(dragHandle).css("cursor"));
-                    $(dragHandle).css("cursor", "move");
+                    $(dragHandle).attr('data-cursor', $(dragHandle).css('cursor'));
+                    $(dragHandle).css('cursor', 'move');
 
                     //on mousedown wait for movement of mouse before triggering dragsort script (dragStart) to allow clicking of hyperlinks to work
                     var listElem = this;
                     var trigger = function () {
                         list.dragStart.call(listElem, e);
-                        $(list.container).unbind("mousemove", trigger);
+                        $(list.container).unbind('mousemove touchmove', trigger);
                     };
-                    $(list.container).mousemove(trigger).mouseup(function () {
-                        $(list.container).unbind("mousemove", trigger);
-                        $(dragHandle).css("cursor", $(dragHandle).attr("data-cursor"));
+                    $(list.container).bind('mousemove touchmove', trigger).bind('mouseup touchend', function () {
+                        $(list.container).unbind('mousemove touchmove', trigger);
+                        $(dragHandle).css('cursor', $(dragHandle).attr('data-cursor'));
                     });
                 },
 
                 dragStart: function (e) {
-                    if (list != null && list.draggedItem != null)
+                    if (list != null && list.draggedItem != null) {
                         list.dropItem();
+                    }
 
-                    list = lists[$(this).attr("data-listidx")];
-                    list.draggedItem = $(e.target).closest("[data-listidx] > " + opts.tagName)
+                    // hack for touching devices
+                    if (e.changedTouches && e.changedTouches[0]) {
+                        e.pageX = e.changedTouches[0].pageX;
+                        e.pageY = e.changedTouches[0].pageY;
+                    }
+
+                    list = lists[$(this).attr('data-listidx')];
+                    list.draggedItem = $(e.target).closest('[data-listidx] > ' + opts.tagName)
 
                     //record current position so on dragend we know if the dragged item changed position or not, not using getItems to allow dragsort to restore dragged item to original location in relation to fixed items
-                    list.draggedItem.attr("data-origpos", $(this).attr("data-listidx") + "-" + $(list.container).children().index(list.draggedItem));
+                    list.draggedItem.attr('data-origpos', $(this).attr('data-listidx') + '-' + $(list.container).children().index(list.draggedItem));
 
                     //calculate mouse offset relative to draggedItem
-                    var mt = parseInt(list.draggedItem.css("marginTop"));
-                    var ml = parseInt(list.draggedItem.css("marginLeft"));
+                    var mt = parseInt(list.draggedItem.css('marginTop'));
+                    var ml = parseInt(list.draggedItem.css('marginLeft'));
                     list.offset = list.draggedItem.offset();
                     list.offset.top = e.pageY - list.offset.top + (isNaN(mt) ? 0 : mt) - 1;
                     list.offset.left = e.pageX - list.offset.left + (isNaN(ml) ? 0 : ml) - 1;
@@ -123,36 +137,36 @@
                     //create placeholder item
                     var h = list.draggedItem.height();
                     var w = list.draggedItem.width();
-                    if (opts.tagName == "tr") {
+                    if (opts.tagName == 'tr') {
                         list.draggedItem.children().each(function () {
                             $(this).width($(this).width());
                         });
-                        list.placeHolderItem = list.draggedItem.clone().attr("data-placeholder", true);
+                        list.placeHolderItem = list.draggedItem.clone().attr('data-placeholder', true);
                         list.draggedItem.after(list.placeHolderItem);
                         list.placeHolderItem.children().each(function () {
                             $(this).css({
                                 borderWidth: 0,
                                 width: $(this).width() + 1,
                                 height: $(this).height() + 1
-                            }).html("&nbsp;");
+                            }).html('&nbsp;');
                         });
                     } else {
                         list.draggedItem.after(opts.placeHolderTemplate);
                         list.placeHolderItem = list.draggedItem.next().css({
                             height: h,
                             width: w
-                        }).attr("data-placeholder", true);
+                        }).attr('data-placeholder', true);
                     }
 
-                    if (opts.tagName == "td") {
-                        var listTable = list.draggedItem.closest("table").get(0);
-                        $("<table id='" + listTable.id + "' style='border-width: 0px;' class='dragSortItem " + listTable.className + "'><tr></tr></table>").appendTo("body").children().append(list.draggedItem);
+                    if (opts.tagName == 'td') {
+                        var listTable = list.draggedItem.closest('table').get(0);
+                        $('<table id="' + listTable.id + '" style="border-width: 0px;" class="dragSortItem ' + listTable.className + '"><tr></tr></table>').appendTo('body').children().append(list.draggedItem);
                     }
 
                     //style draggedItem while dragging
-                    var orig = list.draggedItem.attr("style");
-                    list.draggedItem.attr("data-origstyle", orig ? orig : "");
-                    list.draggedItem.css({position: "absolute", opacity: 0.8, "z-index": 999, height: h, width: w});
+                    var orig = list.draggedItem.attr('style');
+                    list.draggedItem.attr('data-origstyle', orig ? orig : '');
+                    list.draggedItem.css({position: 'absolute', opacity: 0.8, 'z-index': 999, height: h, width: w});
 
                     //auto-scroll setup
                     list.scroll = {
@@ -169,7 +183,7 @@
                         var t = $(opts.scrollContainer).scrollTop();
                         if (list.scroll.moveY > 0 && t < list.scroll.maxY || list.scroll.moveY < 0 && t > 0) {
                             $(opts.scrollContainer).scrollTop(t + list.scroll.moveY);
-                            list.draggedItem.css("top", list.draggedItem.offset().top + list.scroll.moveY + 1);
+                            list.draggedItem.css('top', list.draggedItem.offset().top + list.scroll.moveY + 1);
                         }
                     }, 10);
                     list.scroll.scrollX = window.setInterval(function () {
@@ -180,7 +194,7 @@
                         var l = $(opts.scrollContainer).scrollLeft();
                         if (list.scroll.moveX > 0 && l < list.scroll.maxX || list.scroll.moveX < 0 && l > 0) {
                             $(opts.scrollContainer).scrollLeft(l + list.scroll.moveX);
-                            list.draggedItem.css("left", list.draggedItem.offset().left + list.scroll.moveX + 1);
+                            list.draggedItem.css('left', list.draggedItem.offset().left + list.scroll.moveX + 1);
                         }
                     }, 10);
 
@@ -190,10 +204,11 @@
                         l.buildPositionTable();
                     });
                     list.setPos(e.pageX, e.pageY);
-                    $(document).bind("mousemove", list.swapItems);
-                    $(document).bind("mouseup", list.dropItem);
-                    if (opts.scrollContainer != window)
-                        $(window).bind("wheel", list.wheel);
+                    $(document).bind('mousemove touchmove', list.swapItems);
+                    $(document).bind('mouseup touchend', list.dropItem);
+                    if (opts.scrollContainer != window) {
+                        $(window).bind('wheel', list.wheel);
+                    }
                 },
 
                 //set position of draggedItem
@@ -209,7 +224,7 @@
                     }
 
                     //adjust top & left calculations to parent offset
-                    var parent = this.draggedItem.offsetParent().not("body").offset(); //offsetParent returns body even when it's static, if not static offset is only factoring margin
+                    var parent = this.draggedItem.offsetParent().not('body').offset(); //offsetParent returns body even when it's static, if not static offset is only factoring margin
                     if (parent != null) {
                         top -= parent.top;
                         left -= parent.left;
@@ -263,53 +278,64 @@
                 },
 
                 dropItem: function () {
-                    if (list.draggedItem == null)
+                    if (list.draggedItem == null) {
                         return;
+                    }
 
-                    //list.draggedItem.attr("style", "") doesn't work on IE8 and jQuery 1.5 or lower
-                    //list.draggedItem.removeAttr("style") doesn't work on chrome and jQuery 1.6 (works jQuery 1.5 or lower)
-                    var orig = list.draggedItem.attr("data-origstyle");
-                    list.draggedItem.attr("style", orig);
-                    if (orig == "")
-                        list.draggedItem.removeAttr("style");
-                    list.draggedItem.removeAttr("data-origstyle");
+                    //list.draggedItem.attr('style', '') doesn't work on IE8 and jQuery 1.5 or lower
+                    //list.draggedItem.removeAttr('style') doesn't work on chrome and jQuery 1.6 (works jQuery 1.5 or lower)
+                    var orig = list.draggedItem.attr('data-origstyle');
+                    list.draggedItem.attr('style', orig);
+                    if (orig == '') {
+                        list.draggedItem.removeAttr('style');
+                    }
+                    list.draggedItem.removeAttr('data-origstyle');
 
                     list.styleDragHandlers(true);
 
                     list.placeHolderItem.before(list.draggedItem);
                     list.placeHolderItem.remove();
 
-                    $("[data-droptarget], .dragSortItem").remove();
+                    $('[data-droptarget], .dragSortItem').remove();
 
                     window.clearInterval(list.scroll.scrollY);
                     window.clearInterval(list.scroll.scrollX);
 
                     //if position changed call dragEnd
-                    if (list.draggedItem.attr("data-origpos") != $(lists).index(list) + "-" + $(list.container).children().index(list.draggedItem))
+                    if (list.draggedItem.attr('data-origpos') != $(lists).index(list) + '-' + $(list.container).children().index(list.draggedItem))
                         if (opts.dragEnd.apply(list.draggedItem) == false) { //if dragEnd returns false revert order
-                            var pos = list.draggedItem.attr("data-origpos").split('-');
+                            var pos = list.draggedItem.attr('data-origpos').split('-');
                             var nextItem = $(lists[pos[0]].container).children().not(list.draggedItem).eq(pos[1]);
-                            if (nextItem.length > 0)
+                            if (nextItem.length > 0) {
                                 nextItem.before(list.draggedItem);
-                            else if (pos[1] == 0) //was the only item in list
+                            } else if (pos[1] == 0) {//was the only item in list
                                 $(lists[pos[0]].container).prepend(list.draggedItem);
-                            else //was the last item in list
+                            } else {//was the last item in list
                                 $(lists[pos[0]].container).append(list.draggedItem);
+                            }
                         }
-                    list.draggedItem.removeAttr("data-origpos");
+                    list.draggedItem.removeAttr('data-origpos');
 
                     list.draggedItem = null;
-                    $(document).unbind("mousemove", list.swapItems);
-                    $(document).unbind("mouseup", list.dropItem);
-                    if (opts.scrollContainer != window)
-                        $(window).unbind("wheel", list.wheel);
+                    $(document).unbind('mousemove touchmove', list.swapItems);
+                    $(document).unbind('mouseup touchend', list.dropItem);
+                    if (opts.scrollContainer != window) {
+                        $(window).unbind('wheel', list.wheel);
+                    }
                     return false;
                 },
 
                 //swap the draggedItem (represented visually by placeholder) with the list item the it has been dragged on top of
                 swapItems: function (e) {
-                    if (list.draggedItem == null)
+                    if (list.draggedItem == null) {
                         return false;
+                    }
+
+                    // hack for touching devices
+                    if (e.changedTouches && e.changedTouches[0]) {
+                        e.pageX = e.changedTouches[0].pageX;
+                        e.pageY = e.changedTouches[0].pageY;
+                    }
 
                     //move draggedItem to mouse location
                     list.setPos(e.pageX, e.pageY);
@@ -323,8 +349,9 @@
                     }
 
                     //if not over another moveable list item return
-                    if (ei == -1)
+                    if (ei == -1) {
                         return false;
+                    }
 
                     //save fixed items locations
                     var children = function () {
@@ -335,18 +362,20 @@
                     });
 
                     //if moving draggedItem up or left place placeHolder before list item the dragged item is hovering over otherwise place it after
-                    if (lastPos == null || lastPos.top > list.draggedItem.offset().top || lastPos.left > list.draggedItem.offset().left)
+                    if (lastPos == null || lastPos.top > list.draggedItem.offset().top || lastPos.left > list.draggedItem.offset().left) {
                         $(nlist.pos[ei].elm).before(list.placeHolderItem);
-                    else
+                    } else {
                         $(nlist.pos[ei].elm).after(list.placeHolderItem);
+                    }
 
                     //restore fixed items location
                     fixed.each(function () {
                         var elm = children().eq(this.idx).get(0);
-                        if (this != elm && children().index(this) < this.idx)
+                        if (this != elm && children().index(this) < this.idx) {
                             $(this).insertAfter(elm);
-                        else if (this != elm)
+                        } else if (this != elm) {
                             $(this).insertBefore(elm);
+                        }
                     });
 
                     //misc
@@ -355,39 +384,43 @@
                         l.buildPositionTable();
                     });
                     lastPos = list.draggedItem.offset();
+
                     return false;
                 },
 
                 //returns the index of the list item the mouse is over
                 findPos: function (x, y) {
                     for (var i = 0; i < this.pos.length; i++) {
-                        if (this.pos[i].left < x && this.pos[i].right > x && this.pos[i].top < y && this.pos[i].bottom > y)
+                        if (this.pos[i].left < x && this.pos[i].right > x && this.pos[i].top < y && this.pos[i].bottom > y) {
                             return i;
+                        }
                     }
                     return -1;
                 },
 
                 //create drop targets which are placeholders at the end of other lists to allow dragging straight to the last position
                 createDropTargets: function () {
-                    if (!opts.dragBetween)
+                    if (!opts.dragBetween) {
                         return;
+                    }
 
                     $(lists).each(function () {
-                        var ph = $(this.container).find("[data-placeholder]");
-                        var dt = $(this.container).find("[data-droptarget]");
-                        if (ph.length > 0 && dt.length > 0)
+                        var ph = $(this.container).find('[data-placeholder]');
+                        var dt = $(this.container).find('[data-droptarget]');
+                        if (ph.length > 0 && dt.length > 0) {
                             dt.remove();
-                        else if (ph.length == 0 && dt.length == 0) {
-                            if (opts.tagName == "td")
-                                $(opts.placeHolderTemplate).attr("data-droptarget", true).appendTo(this.container);
-                            else
-                            //list.placeHolderItem.clone().removeAttr("data-placeholder") crashes in IE7 and jquery 1.5.1 (doesn't in jquery 1.4.2 or IE8)
-                                $(this.container).append(list.placeHolderItem.removeAttr("data-placeholder").clone().attr("data-droptarget", true));
+                        } else if (ph.length == 0 && dt.length == 0) {
+                            if (opts.tagName == 'td') {
+                                $(opts.placeHolderTemplate).attr('data-droptarget', true).appendTo(this.container);
+                            } else {
+                                //list.placeHolderItem.clone().removeAttr('data-placeholder') crashes in IE7 and jquery 1.5.1 (doesn't in jquery 1.4.2 or IE8)
+                                $(this.container).append(list.placeHolderItem.removeAttr('data-placeholder').clone().attr('data-droptarget', true));
+                            }
 
-                            list.placeHolderItem.attr("data-placeholder", true);
+                            list.placeHolderItem.attr('data-placeholder', true);
                         }
                     });
-                }
+                },
             };
 
             newList.init();
@@ -398,16 +431,16 @@
     };
 
     $.fn.dragsort.defaults = {
-        itemSelector: "",
-        dragSelector: "",
-        dragSelectorExclude: "input, textarea",
+        itemSelector: '',
+        dragSelector: '',
+        dragSelectorExclude: 'input, textarea',
         dragEnd: function () {
         },
         dragBetween: false,
-        placeHolderTemplate: "",
+        placeHolderTemplate: '',
         scrollContainer: window,
         scrollSpeed: 5,
-        cursor: "pointer"
+        cursor: 'pointer'
     };
 
 })(jQuery);

@@ -20,8 +20,5 @@
   "repository": {
     "type": "git",
     "url": "http://github.com/agavazov/dragsort.git"
-  },
-  "dependencies": {
-    "jquery": "latest"
   }
 }

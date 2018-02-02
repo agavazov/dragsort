@@ -68,12 +68,9 @@
 
 <h1>jQuery List DragSort Example</h1>
 
-<a href="http://dragsort.codeplex.com/">Homepage</a><br/>
-<br/>
-
 <h2>Simple 1D list:</h2>
 
-<ul>
+<ul id="simple-list">
     <li>bread</li>
     <li>vegetables</li>
     <li>meat</li>
@@ -85,7 +82,7 @@
 
 <script type="text/javascript">
     $(function () {
-        $("ul:first").dragsort();
+        $("#simple-list").dragsort();
     });
 </script>
 
@@ -152,7 +149,10 @@
 </ul>
 
 <!-- save sort order here which can be retrieved on server on postback -->
-<input name="list1SortOrder" type="hidden"/>
+
+<div style="clear:both;"></div>
+<hr/>
+<input name="list1SortOrder" type="text" size="30" style="font-size: 20px;"/>
 
 <script type="text/javascript">
     function saveOrder() {

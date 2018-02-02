@@ -20,8 +20,8 @@ Supports `bower` and `npm`
 
 $('ul').dragsort({
     dragSelector: 'li',
-    dragEnd: function(data) {
-        console.log(data);
+    dragEnd: function() {
+        console.log('Drag End');
     }, dragBetween: false,
     placeHolderTemplate: '<li></li>'
 }); 

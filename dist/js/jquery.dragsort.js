@@ -5,7 +5,7 @@
 (function ($) {
     $.fn.dragsort = function (options) {
         if (options == 'destroy') {
-            $(this.selector).trigger('dragsort-uninit');
+            $(this).trigger('dragsort-uninit');
             return;
         }
 

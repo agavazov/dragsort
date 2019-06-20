@@ -6,7 +6,7 @@ Supports `bower` and `npm`
 
 ![](https://github.com/agavazov/dragsort/raw/master/example.png)
 
-[Demo](http://htmlpreview.github.io/?https://github.com/agavazov/dragsort/blob/master/example.html)
+[Demo](https://raw.githack.com/agavazov/dragsort/master/example.html)
 
 ## Changes by me
 - Support touch events

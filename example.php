@@ -31,7 +31,6 @@
         
 		<h1>jQuery List DragSort PHP Example</h1>
 	    
-	    <a href="http://dragsort.codeplex.com/">Homepage</a><br/>
 	    <br/>
         
         <h2>Save list order with ajax:</h2>

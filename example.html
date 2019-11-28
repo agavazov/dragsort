@@ -168,7 +168,7 @@
             dragBetween: true,
             dragEnd: saveOrder,
             placeHolderTemplate: "<li class='placeHolder'><div></div></li>",
-			cursor: "move"
+            cursor: "move"
         });
     });
 </script>
@@ -177,29 +177,45 @@
 
 <h2>Usage</h2>
 
-<p>$("ul").dragsort({ dragSelector: "li", dragEnd: function() { }, dragBetween: false, placeHolderTemplate: "&lt;li&gt;&lt;/li&gt;" });</p>
+<p>$("ul").dragsort({ dragSelector: "li", dragEnd: function() { }, dragBetween: false, placeHolderTemplate: "&lt;li&gt;&lt;/li&gt;"
+    });</p>
 <p>$("ul").dragsort("destroy");</p>
 <br/>
 
 <dl>
     <dt>dragSelector</dt>
     <dd>The
-        <a href="http://api.jquery.com/category/selectors/">CSS selector</a> of the element inside the list item to act as the drag handle. The default is the list item itself e.g. LI.
+        <a href="http://api.jquery.com/category/selectors/">CSS selector</a> of the element inside the list item to act
+        as the drag handle. The default is the list item itself e.g. LI.
     </dd>
     <dt>dragSelectorExclude</dt>
-    <dd>The css selector of the elements inside the dragSelector to not trigger dragsort. The default is "input, textarea".</dd>
+    <dd>The css selector of the elements inside the dragSelector to not trigger dragsort. The default is "input,
+        textarea".
+    </dd>
     <dt>itemSelector</dt>
-    <dd>The css selector of the list items that are moveable. Will only match elements that are immediate children of list container. The default is tag name of first child e.g. LI.</dd>
+    <dd>The css selector of the list items that are moveable. Will only match elements that are immediate children of
+        list container. The default is tag name of first child e.g. LI.
+    </dd>
     <dt>dragEnd</dt>
-    <dd>The callback function that will be called after the dragging has ended (only called if the list order has changed). The keyword "this" in function will refer to list item that was dragged.</dd>
+    <dd>The callback function that will be called after the dragging has ended (only called if the list order has
+        changed). The keyword "this" in function will refer to list item that was dragged.
+    </dd>
     <dt>dragBetween</dt>
-    <dd>Set to "true" if you want to enable the ability to drag between selected lists or to allow dragging of the list item outside of the list for auto scroll. The default is false.</dd>
+    <dd>Set to "true" if you want to enable the ability to drag between selected lists or to allow dragging of the list
+        item outside of the list for auto scroll. The default is false.
+    </dd>
     <dt>placeHolderTemplate</dt>
-    <dd>The html of the place holder for the dragged item. The default is empty list item e.g. "&lt;li&gt;&lt;/li&gt;".</dd>
+    <dd>The html of the place holder for the dragged item. The default is empty list item e.g.
+        "&lt;li&gt;&lt;/li&gt;".
+    </dd>
     <dt>scrollContainer</dt>
-    <dd>The css selector of the element that is to act as the scroll container e.g. a div with overflow set to auto. The default is window.</dd>
+    <dd>The css selector of the element that is to act as the scroll container e.g. a div with overflow set to auto. The
+        default is window.
+    </dd>
     <dt>scrollSpeed</dt>
-    <dd>A number that represents the speed that the page will scroll when dragging an item outside the scroll container, a higher value is faster and a lower value is slower. Set to 0 to disable scrolling. The default is 5.</dd>
+    <dd>A number that represents the speed that the page will scroll when dragging an item outside the scroll container,
+        a higher value is faster and a lower value is slower. Set to 0 to disable scrolling. The default is 5.
+    </dd>
 </dl>
 </body>
 </html>

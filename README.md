@@ -8,12 +8,12 @@ Supports `bower` and `npm`
 
 [Demo](https://raw.githack.com/agavazov/dragsort/master/example.html)
 
-## Changes by me
+## Latest changes
 - Support touch events
 - Support latest jQuery version
 - Add new option `cursor` which can change default cursor from "pointer" to "move" for example
 - Optimize the code
-- Make it works with `bower` or `npm`
+- Create `bower` and `npm` packages
 
 ## Usage
 ```javascript

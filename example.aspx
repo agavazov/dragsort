@@ -21,7 +21,7 @@
         
         <h1>jQuery List DragSort ASP.NET Example</h1>
 	    
-	    <a href="http://dragsort.codeplex.com/">Homepage</a><br/>
+	    <a href="https://github.com/agavazov/dragsort/">Homepage</a><br/>
 	    <br/>
         
         <h2>Save list order with ajax:</h2>
